@@ -7,7 +7,11 @@ const QuoteContext = createContext(null);
 
 export function QuoteProvider({ children }) {
   const [quotes, setQuotes] = useState(
-    initialQuotes.map((quote, index) => ({ id: String(index + 1), ...quote })),
+    initialQuotes.map((quote, index) => ({
+      id: String(index + 1),
+      likesCount: 0,
+      ...quote,
+    })),
   );
   const userId = "user_123";
 
@@ -30,8 +34,28 @@ export function QuoteProvider({ children }) {
     });
   };
 
+  const incrementLike = (quoteId) => {
+    setQuotes((prevQuotes) =>
+      prevQuotes.map((quote) => {
+        if (quote.id !== quoteId) return quote;
+        return { ...quote, likesCount: quote.likesCount + 1 };
+      }),
+    );
+  };
+
+  const resetLike = (quoteId) => {
+    setQuotes((prevQuotes) =>
+      prevQuotes.map((quote) => {
+        if (quote.id !== quoteId) return quote;
+        return { ...quote, likesCount: 0 };
+      }),
+    );
+  };
+
   return (
-    <QuoteContext.Provider value={{ quotes, setQuotes, toggleLikeQuote }}>
+    <QuoteContext.Provider
+      value={{ quotes, setQuotes, toggleLikeQuote, incrementLike, resetLike }}
+    >
       {children}
     </QuoteContext.Provider>
   );

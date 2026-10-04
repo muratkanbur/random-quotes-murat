@@ -9,10 +9,9 @@ import { Card } from "@/components/Card";
 import { useQuotes } from "@/app/context/QuoteContext";
 
 export default function Home() {
-  const { quotes, toggleLikeQuote } = useQuotes();
+  const { quotes, incrementLike } = useQuotes();
   const [index, setIndex] = useState(0);
-  const userId = "user_123";
-  const isLiked = quotes[index]?.likedBy?.includes(userId);
+  const isLiked = (quotes[index]?.likesCount || 0) > 0;
 
   function handleClick() {
     setIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -27,8 +26,8 @@ export default function Home() {
       <Card isLiked={isLiked} key={quotes[index].id || index}>
         <div className="absolute top-4 right-4">
           <LikeButton
-            isLiked={isLiked}
-            handleClick={() => toggleLikeQuote(quotes[index].id)}
+            likesCount={quotes[index].likesCount || 0}
+            handleClick={() => incrementLike(quotes[index]?.id)}
           />
         </div>
 
