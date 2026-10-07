@@ -22,7 +22,10 @@ export default function Home() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-emerald-100 p-4">
+    <main
+      className="flex flex-col items-center justify-center min-h-screen bg-  --background: oklch(1 0 0);
+ p-4"
+    >
       <Card isLiked={isLiked} key={quotes[index].id || index}>
         <div className="absolute top-4 right-4">
           <LikeButton

@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, DM_Sans, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { QuoteProvider } from "@/app/context/QuoteContext";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { TopNavigation } from "@/components/TopNavigation";
+
+const nunitoSansHeading = Nunito_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,24 +32,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={cn(
+        "h-full",
+        "antialiased",
+        geistSans.variable,
+        geistMono.variable,
+        "font-sans",
+        dmSans.variable,
+        nunitoSansHeading.variable,
+      )}
     >
       <body className="min-h-full flex flex-col">
-        <QuoteProvider>
-          <nav className="flex justify-center gap-6 p-4 bg-emerald-800 text-white font-medium shadow-md">
-            <Link href="/" className="hover:text-emerald-200 transition-colors">
-              Home
-            </Link>
-            <Link
-              href="/user/quotes/liked"
-              className="hover:text-emerald-200 transition-colors"
-            >
-              Liked Quotes
-            </Link>
-          </nav>
-
-          {children}
-        </QuoteProvider>
+        <TopNavigation />
+        <QuoteProvider>{children}</QuoteProvider>
       </body>
     </html>
   );
