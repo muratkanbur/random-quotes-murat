@@ -12,9 +12,9 @@ export default function LikedQuotesPage() {
   const LikedQuotes = quotes.filter((quote) => (quote.likesCount || 0) > 0);
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen   bg-emerald-100 p-4">
+    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4 gap-4">
       {LikedQuotes.length === 0 ? (
-        <p className="text-emerald-900 font-semibold">
+        <p className="text-muted-foreground font-semibold">
           There are no liked quotes yet.
         </p>
       ) : (
@@ -29,14 +29,14 @@ export default function LikedQuotesPage() {
 
             <button
               onClick={() => resetLike(quote.id)}
-              className="p-1 hover:bg-black/20 rounded-full transition-colors
-              text-sm"
+              className="p-1.5 hover:bg-muted rounded-full transition-colors text-sm w-fit"
               title="Remove from liked"
+              aria-label="Remove quote from liked list" // ✅ Lighthouse a11y için eklendi
             >
               🗑️
             </button>
 
-            <div className="flex-1 flex flex-col justify-center pt-8 pb-2 px-2">
+            <div className="flex-1 flex flex-col justify-center pt-6 pb-2 px-2">
               <div className="italic transition-all duration-300">
                 <QuoteText>{quote.quote}</QuoteText>
               </div>
