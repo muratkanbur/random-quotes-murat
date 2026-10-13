@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/context/QuoteContext.jsx", "app/page.jsx"  ],
+, "app/context/QuoteContext.tsx", "app/page.tsx"  ],
   "exclude": ["node_modules"]
 }

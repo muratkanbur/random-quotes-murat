@@ -1,4 +1,9 @@
-export function LikeButton({ handleClick, likesCount = 0 }) {
+interface LikeButtonProps {
+  handleClick: () => void;
+  likesCount?: number;
+}
+
+export function LikeButton({ handleClick, likesCount = 0 }: LikeButtonProps) {
   return (
     <button
       onClick={handleClick}

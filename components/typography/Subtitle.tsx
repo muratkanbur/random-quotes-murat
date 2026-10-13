@@ -1,4 +1,11 @@
-export function Subtitle({ element = "span", children }) {
+import { ReactNode } from "react";
+
+interface SubtitleProps {
+  element?: "h2" | "span";
+  children: ReactNode;
+}
+
+export function Subtitle({ element = "span", children }: SubtitleProps) {
   switch (element) {
     case "h2":
       return (

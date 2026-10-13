@@ -16,19 +16,19 @@ export function TopNavigation() {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuLink
-                asChild
+                render={<Link href="/" />}
                 className={navigationMenuTriggerStyle()}
               >
-                <Link href="/">Home</Link>
+                Home
               </NavigationMenuLink>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
               <NavigationMenuLink
-                asChild
+                render={<Link href="/user/quotes/liked" />}
                 className={navigationMenuTriggerStyle()}
               >
-                <Link href="/user/quotes/liked">Liked Quotes</Link>
+                Liked Quotes
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>

@@ -1,4 +1,11 @@
-export const Card = ({ children, isLiked }) => {
+import { ReactNode } from "react";
+
+interface CardProps {
+  children: ReactNode;
+  isLiked?: boolean;
+}
+
+export const Card = ({ children, isLiked }: CardProps) => {
   return (
     <div
       className={`relative text-center bg-card text-card-foreground p-6 rounded-2xl border border-border shadow-md max-w-md w-full min-h-[230px] flex flex-col justify-between transition-all duration-300 ${
