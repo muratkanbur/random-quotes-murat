@@ -3,24 +3,29 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
+export enum Theme {
+  Light = "light",
+  Dark = "dark",
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<Theme>(Theme.Light);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      setTheme("dark");
+    if (savedTheme === Theme.Dark) {
+      setTheme(Theme.Dark);
       document.documentElement.classList.add("dark");
     }
   }, []);
 
   const toggleTheme = () => {
     if (theme === "dark") {
-      setTheme("light");
+      setTheme(Theme.Light);
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
     } else {
-      setTheme("dark");
+      setTheme(Theme.Dark);
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     }
