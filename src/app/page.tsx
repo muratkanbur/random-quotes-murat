@@ -7,10 +7,12 @@ import { useState } from "react";
 import { LikeButton } from "@/components/LikeButton";
 import { Card } from "@/components/Card";
 import { useQuotes } from "@/app/context/QuoteContext";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function Home() {
-  const { quotes, incrementLike } = useQuotes();
+  const { quotes, toggleLikeQuote } = useQuotes();
   const [index, setIndex] = useState(0);
+  const { user } = useUser();
 
   if (!quotes || quotes.length === 0) {
     return (
@@ -21,7 +23,9 @@ export default function Home() {
   }
 
   const currentQuote = quotes[index];
-  const isLiked = (currentQuote?.likesCount || 0) > 0;
+  const isLiked = Boolean(
+    user?.sub && currentQuote?.likedBy?.includes(user.sub),
+  );
 
   function handleClick() {
     setIndex((prevIndex) => (prevIndex + 1) % quotes.length);
@@ -31,14 +35,22 @@ export default function Home() {
     setIndex((prevIndex) => (prevIndex - 1 + quotes.length) % quotes.length);
   }
 
+  function handleLike() {
+    if (!user || !user.sub) {
+      alert("You need to be logged in to like a quote.");
+      return;
+    }
+
+    if (currentQuote?.id) {
+      toggleLikeQuote(currentQuote.id, user.sub);
+    }
+  }
+
   return (
     <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
       <Card isLiked={isLiked} key={currentQuote?.id || index}>
         <div className="absolute top-4 right-4">
-          <LikeButton
-            likesCount={currentQuote?.likesCount || 0}
-            handleClick={() => incrementLike(currentQuote?.id)}
-          />
+          <LikeButton isLiked={isLiked} handleClick={handleLike} />
         </div>
         <div
           aria-live="polite"

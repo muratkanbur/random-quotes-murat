@@ -15,19 +15,19 @@ export function ThemeToggle() {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === Theme.Dark) {
       setTheme(Theme.Dark);
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add(Theme.Dark);
     }
   }, []);
 
   const toggleTheme = () => {
-    if (theme === "dark") {
+    if (theme === Theme.Dark) {
       setTheme(Theme.Light);
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove(Theme.Dark);
+      localStorage.setItem("theme", Theme.Light);
     } else {
       setTheme(Theme.Dark);
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
+      document.documentElement.classList.add(Theme.Dark);
+      localStorage.setItem("theme", Theme.Dark);
     }
   };
 
@@ -38,7 +38,7 @@ export function ThemeToggle() {
       aria-label="Toggle theme"
       onClick={toggleTheme}
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === Theme.Dark ? "☀️" : "🌙"}
     </Button>
   );
 }

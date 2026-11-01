@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { quotes as initialQuotes } from "@/app/quotes";
 
 export interface QuoteItem {
@@ -14,9 +20,7 @@ export interface QuoteItem {
 interface QuoteContextType {
   quotes: QuoteItem[];
   setQuotes: React.Dispatch<React.SetStateAction<QuoteItem[]>>;
-  toggleLikeQuote: (quoteId: string) => void;
-  incrementLike: (quoteId: string) => void;
-  resetLike: (quoteId: string) => void;
+  toggleLikeQuote: (quoteId: string, userId: string) => void;
 }
 
 const QuoteContext = createContext<QuoteContextType | null>(null);
@@ -27,14 +31,33 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
       (quote, index): QuoteItem => ({
         ...quote,
         id: String(index + 1),
-        likesCount: 0,
+        likesCount: ((quote.likedBy as string[]) || []).length,
         likedBy: quote.likedBy as string[],
       }),
     ),
   );
-  const userId = "user_123";
 
-  const toggleLikeQuote = (quoteId: string) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedQuotes = localStorage.getItem("random_quotes_data");
+    if (savedQuotes) {
+      try {
+        setQuotes(JSON.parse(savedQuotes));
+      } catch (error) {
+        console.error("Could not parse quotes from localStorage", error);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("random_quotes_data", JSON.stringify(quotes));
+    }
+  }, [quotes, isLoaded]);
+
+  const toggleLikeQuote = (quoteId: string, userId: string) => {
     setQuotes((prevQuotes) => {
       return prevQuotes.map((quote) => {
         if (quote.id !== quoteId) {
@@ -48,33 +71,17 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
           ? currentLikedBy.filter((id) => id !== userId)
           : [...currentLikedBy, userId];
 
-        return { ...quote, likedBy: updateLikedBy };
+        return {
+          ...quote,
+          likedBy: updateLikedBy,
+          likesCount: updateLikedBy.length,
+        };
       });
     });
   };
 
-  const incrementLike = (quoteId: string) => {
-    setQuotes((prevQuotes) =>
-      prevQuotes.map((quote) => {
-        if (quote.id !== quoteId) return quote;
-        return { ...quote, likesCount: quote.likesCount + 1 };
-      }),
-    );
-  };
-
-  const resetLike = (quoteId: string) => {
-    setQuotes((prevQuotes) =>
-      prevQuotes.map((quote) => {
-        if (quote.id !== quoteId) return quote;
-        return { ...quote, likesCount: 0 };
-      }),
-    );
-  };
-
   return (
-    <QuoteContext.Provider
-      value={{ quotes, setQuotes, toggleLikeQuote, incrementLike, resetLike }}
-    >
+    <QuoteContext.Provider value={{ quotes, setQuotes, toggleLikeQuote }}>
       {children}
     </QuoteContext.Provider>
   );
