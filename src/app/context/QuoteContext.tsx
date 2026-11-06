@@ -15,12 +15,17 @@ export interface QuoteItem {
   author: string;
   likedBy: string[];
   likesCount: number;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface QuoteContextType {
   quotes: QuoteItem[];
   setQuotes: React.Dispatch<React.SetStateAction<QuoteItem[]>>;
   toggleLikeQuote: (quoteId: string, userId: string) => void;
+  addQuote: (newQuote: QuoteItem) => void;
+  updateQuote: (id: string, updated: { quote: string; author: string }) => void;
 }
 
 const QuoteContext = createContext<QuoteContextType | null>(null);
@@ -80,8 +85,32 @@ export function QuoteProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const addQuote = (newQuote: QuoteItem) => {
+    setQuotes((prev) => {
+      if (prev.some((q) => q.id === newQuote.id)) {
+        return prev;
+      }
+      return [newQuote, ...prev];
+    });
+  };
+
+  const updateQuote = (
+    id: string,
+    updated: { quote: string; author: string },
+  ) => {
+    setQuotes((prev) =>
+      prev.map((q) =>
+        q.id == id
+          ? { ...q, ...updated, updateAt: new Date().toISOString() }
+          : q,
+      ),
+    );
+  };
+
   return (
-    <QuoteContext.Provider value={{ quotes, setQuotes, toggleLikeQuote }}>
+    <QuoteContext.Provider
+      value={{ quotes, setQuotes, toggleLikeQuote, addQuote, updateQuote }}
+    >
       {children}
     </QuoteContext.Provider>
   );

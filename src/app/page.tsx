@@ -8,6 +8,7 @@ import { LikeButton } from "@/components/LikeButton";
 import { Card } from "@/components/Card";
 import { useQuotes } from "@/app/context/QuoteContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import Link from "next/link";
 
 export default function Home() {
   const { quotes, toggleLikeQuote } = useQuotes();
@@ -27,6 +28,9 @@ export default function Home() {
     user?.sub && currentQuote?.likedBy?.includes(user.sub),
   );
 
+  const isOwner = Boolean(
+    user?.sub && currentQuote?.createdBy && currentQuote.createdBy === user.sub,
+  );
   function handleClick() {
     setIndex((prevIndex) => (prevIndex + 1) % quotes.length);
   }
@@ -49,6 +53,17 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
       <Card isLiked={isLiked} key={currentQuote?.id || index}>
+        {isOwner && (
+          <div className="absolute top-4 left-4">
+            <Link
+              href={`/quotes/${currentQuote.id}/edit`}
+              className="text-xs px-2.5 py-1.5 rounded-md border border-input bg-background/80 hover:bg-accent hover:text-accent-foreground font-medium shadow-sm transition-colors"
+            >
+              Edit Quote
+            </Link>
+          </div>
+        )}
+
         <div className="absolute top-4 right-4">
           <LikeButton isLiked={isLiked} handleClick={handleLike} />
         </div>

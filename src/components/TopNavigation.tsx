@@ -39,6 +39,14 @@ export async function TopNavigation() {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <NavigationMenuLink
+                    render={<Link href="/quotes/new" />}
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    Add New Quotes
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
                     render={<Link href="/user/profile" />}
                     className={navigationMenuTriggerStyle()}
                   >
