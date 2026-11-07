@@ -7,6 +7,7 @@ import { handleEditQuote, EditQuoteFormState } from "./action";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { quoteCategories } from "@/type";
 
 interface EditQuoteFormProps {
   id: string;
@@ -27,6 +28,8 @@ export default function EditQuoteForm({
     data: {
       quote: quote?.quote || "",
       author: quote?.author || "",
+      category: quote?.category || "",
+      tags: quote?.tags?.join(", ") || "",
     },
   };
 
@@ -40,6 +43,11 @@ export default function EditQuoteForm({
       updateQuote(id, {
         quote: state.data.quote,
         author: state.data.author,
+        category: state.data.category,
+        tags: state.data.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
       });
       router.push("/");
     }
@@ -102,6 +110,42 @@ export default function EditQuoteForm({
         />
         {state.errors?.fieldErrors?.author && (
           <FieldError>{state.errors.fieldErrors.author.join(" ")}</FieldError>
+        )}
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="editCategory">Category</FieldLabel>
+        <select
+          id="editCategory"
+          name="category"
+          defaultValue={state.data?.category ?? quote.category ?? ""}
+          aria-invalid={!!state.errors?.fieldErrors?.category?.length}
+          className="h-9 w-full rounded-md border border-input bg-background px-3"
+        >
+          <option value="">Select a category</option>
+          {quoteCategories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        {state.errors?.fieldErrors?.category && (
+          <FieldError>{state.errors.fieldErrors.category.join(" ")}</FieldError>
+        )}
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="editTags">Tags</FieldLabel>
+        <input
+          id="editTags"
+          type="text"
+          name="tags"
+          placeholder="success, motivation, life"
+          defaultValue={state.data?.tags ?? quote.tags?.join(", ") ?? ""}
+          aria-invalid={!!state.errors?.fieldErrors?.tags?.length}
+        ></input>
+        {state.errors?.fieldErrors?.tags && (
+          <FieldError>{state.errors.fieldErrors.tags.join(" ")}</FieldError>
         )}
       </Field>
 

@@ -9,11 +9,17 @@ import { Card } from "@/components/Card";
 import { useQuotes } from "@/app/context/QuoteContext";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
+import { quoteCategories } from "@/type";
 
 export default function Home() {
   const { quotes, toggleLikeQuote } = useQuotes();
   const [index, setIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const { user } = useUser();
+  const filteredQuotes =
+    selectedCategory === "All"
+      ? quotes
+      : quotes.filter((quote) => quote.category === selectedCategory);
 
   if (!quotes || quotes.length === 0) {
     return (
@@ -23,7 +29,34 @@ export default function Home() {
     );
   }
 
-  const currentQuote = quotes[index];
+  if (filteredQuotes.length === 0) {
+    return (
+      <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center gap-4 p-4">
+        <label htmlFor="emptyCategoryFilter">Category</label>
+        <select
+          id="emptyCategoryFilter"
+          value={selectedCategory}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setIndex(0);
+          }}
+          className="rounded-md border border-input bg-background px-3 py-2"
+        >
+          <option value="All">All Categories</option>
+          {quoteCategories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        <p className="text-muted-foreground">
+          There are no quotes in this category yet.
+        </p>
+      </main>
+    );
+  }
+
+  const currentQuote = filteredQuotes[index % filteredQuotes.length];
   const isLiked = Boolean(
     user?.sub && currentQuote?.likedBy?.includes(user.sub),
   );
@@ -32,11 +65,14 @@ export default function Home() {
     user?.sub && currentQuote?.createdBy && currentQuote.createdBy === user.sub,
   );
   function handleClick() {
-    setIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+    setIndex((prevIndex) => (prevIndex + 1) % filteredQuotes.length);
   }
 
   function handlePrevClick() {
-    setIndex((prevIndex) => (prevIndex - 1 + quotes.length) % quotes.length);
+    setIndex(
+      (prevIndex) =>
+        (prevIndex - 1 + filteredQuotes.length) % filteredQuotes.length,
+    );
   }
 
   function handleLike() {
@@ -52,6 +88,25 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
+      <label className="mb-4 flex items-center gap-2">
+        Category
+        <select
+          value={selectedCategory}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setIndex(0);
+          }}
+          className="rounded-md border border-input bg-background px-3 py-2"
+        >
+          <option value="All">All Categories</option>
+          {quoteCategories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <Card isLiked={isLiked} key={currentQuote?.id || index}>
         {isOwner && (
           <div className="absolute top-4 left-4">
@@ -75,6 +130,25 @@ export default function Home() {
             <QuoteText>{currentQuote?.quote}</QuoteText>
           </div>
           <Subtitle>{currentQuote?.author}</Subtitle>
+
+          {currentQuote?.category && (
+            <span className="mt-3 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {currentQuote.category}
+            </span>
+          )}
+
+          {!!currentQuote?.tags?.length && (
+            <div className="mt-2 flex flex-wrap justify-center gap-2">
+              {currentQuote.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-4 justify-center">

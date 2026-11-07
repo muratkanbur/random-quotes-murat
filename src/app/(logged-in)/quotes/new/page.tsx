@@ -4,15 +4,19 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useActionState, useEffect, useRef } from "react";
 import { handleNewQuote } from "./action";
-import { redirect, useRouter } from "next/navigation";
-import { NewQuoteFormState } from "@/type";
+import { useRouter } from "next/navigation";
+import { NewQuoteFormState, quoteSchema, quoteCategories } from "@/type";
 import { useQuotes } from "@/app/context/QuoteContext";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const initialState = {
   success: false,
   data: {
     quote: "",
     author: "",
+    category: "",
+    tags: "",
   },
 };
 
@@ -24,6 +28,11 @@ export default function NewQuotePage() {
     NewQuoteFormState,
     FormData
   >(handleNewQuote, initialState);
+
+  const {
+    register,
+    formState: { errors },
+  } = useForm({ mode: "onChange", resolver: zodResolver(quoteSchema) });
 
   useEffect(() => {
     if (state.success && state.createdQuote && !hasAdded.current) {
@@ -44,12 +53,22 @@ export default function NewQuotePage() {
           id="newQuote"
           type="text"
           autoComplete="off"
-          aria-invalid={!!state.errors?.fieldErrors?.quote?.join("")}
-          name="quote"
+          aria-invalid={
+            !!state.errors?.fieldErrors?.quote?.join("") ||
+            !!errors.quote?.message
+          }
           defaultValue={state.data?.quote ?? ""}
+          {...register("quote")}
         />
 
-        {!!state.errors?.fieldErrors?.quote?.join(" ") ? (
+        {!!errors.quote?.message ? (
+          <FieldError>{errors.quote?.message.toString()}</FieldError>
+        ) : (
+          <></>
+        )}
+
+        {!errors.quote?.message &&
+        !!state.errors?.fieldErrors?.quote?.join(" ") ? (
           <FieldError>{state.errors?.fieldErrors?.quote?.join(" ")}</FieldError>
         ) : (
           <></>
@@ -62,11 +81,21 @@ export default function NewQuotePage() {
           id="newAuthor"
           type="text"
           autoComplete="off"
-          aria-invalid={!!state.errors?.fieldErrors?.author?.join("")}
-          name="author"
+          aria-invalid={
+            !!state.errors?.fieldErrors?.author?.join("") ||
+            !!errors.author?.message
+          }
           defaultValue={state.data?.author ?? ""}
+          {...register("author")}
         />
-        {!!state.errors?.fieldErrors?.author?.join(" ") ? (
+
+        {!!errors.author?.message ? (
+          <FieldError>{errors.author?.message.toString()}</FieldError>
+        ) : (
+          <></>
+        )}
+        {!errors.author?.message &&
+        !!state.errors?.fieldErrors?.author?.join(" ") ? (
           <FieldError>
             {state.errors?.fieldErrors?.author?.join(" ")}
           </FieldError>
@@ -74,6 +103,58 @@ export default function NewQuotePage() {
           <></>
         )}
       </Field>
+
+      <Field>
+        <FieldLabel htmlFor="newCategory">Category</FieldLabel>
+        <select
+          id="newCategory"
+          aria-invalid={
+            !!state.errors?.fieldErrors?.category?.length ||
+            !!errors.category?.message
+          }
+          defaultValue={state.data?.category ?? ""}
+          {...register("category")}
+        >
+          <option value="">Select a category</option>
+          {quoteCategories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        {errors.category?.message ? (
+          <FieldError>{errors.category.message}</FieldError>
+        ) : state.errors?.fieldErrors?.category?.length ? (
+          <FieldError>
+            {state.errors?.fieldErrors?.category?.join(" ")}
+          </FieldError>
+        ) : (
+          <></>
+        )}
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="newTags">Add Tags</FieldLabel>
+        <Input
+          id="newTags"
+          type="text"
+          autoComplete="off"
+          placeholder="success, mindset, discipline"
+          aria-invalid={
+            !!state.errors?.fieldErrors?.tags?.join("") ||
+            !!errors.tags?.message
+          }
+          defaultValue={state.data?.tags ?? ""}
+          {...register("tags")}
+        />
+
+        {errors.tags?.message ? (
+          <FieldError>{errors.tags?.message}</FieldError>
+        ) : state.errors?.fieldErrors?.tags?.length ? (
+          <FieldError> {state.errors.fieldErrors.tags.join(" ")} </FieldError>
+        ) : null}
+      </Field>
+
       <Button className={"w-full"} type="submit" disabled={isPending}>
         {isPending ? "Saving..." : "Save"}
       </Button>

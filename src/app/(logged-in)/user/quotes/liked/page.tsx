@@ -38,6 +38,24 @@ export default function LikedQuotesPage() {
                 <QuoteText>{quote.quote}</QuoteText>
               </div>
               <Subtitle>{quote.author}</Subtitle>
+              {quote?.category && (
+                <span className="mt-3 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {quote.category}
+                </span>
+              )}
+
+              {!!quote?.tags?.length && (
+                <div className="mt-2 flex flex-wrap justify-center gap-2">
+                  {quote.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         ))

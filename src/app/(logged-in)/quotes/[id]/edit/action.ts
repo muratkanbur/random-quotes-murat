@@ -7,11 +7,15 @@ export interface EditQuoteFormState {
   data?: {
     quote: string;
     author: string;
+    category: string;
+    tags: string;
   };
   errors?: {
     fieldErrors: {
       quote?: string[];
       author?: string[];
+      category?: string[];
+      tags?: string[];
     };
   };
   message?: string;
@@ -22,6 +26,8 @@ export async function handleEditQuote (_previousState: EditQuoteFormState,
     const rawData = {
     quote: formData.get("quote") ?? "",
     author: formData.get("author") ?? "",
+    category: formData.get("category") ?? "",
+    tags: formData.get("tags") ?? "",
   };
 const result = quoteSchema.safeParse(rawData);
  if (!result.success) {
@@ -31,13 +37,20 @@ const result = quoteSchema.safeParse(rawData);
       data: {
         quote: String(rawData.quote),
         author: String(rawData.author),
+        category: String(rawData.category),
+        tags: String(rawData.tags),
       },
       errors: { fieldErrors: errors.fieldErrors },
     };
   }
 return {
     success: true,
-    data: result.data,
+    data: {
+      quote: result.data.quote,
+      author: result.data.author,
+      category: result.data.category,
+      tags: result.data.tags ?? "", 
+    },
     message: "Quote updated successfully",
   };
 

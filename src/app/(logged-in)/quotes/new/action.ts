@@ -22,6 +22,8 @@ export async function handleNewQuote (_previousState: NewQuoteFormState,
   const rawData = {
     quote: formData.get("quote") ?? "",
     author: formData.get("author") ?? "",
+    category: formData.get("category") ?? "",
+    tags: formData.get("tags") ?? "",
   }
 
   const result = quoteSchema.safeParse(rawData);
@@ -34,6 +36,8 @@ export async function handleNewQuote (_previousState: NewQuoteFormState,
       data: {
       quote: String(rawData.quote),
       author: String(rawData.author),
+      category: String(rawData.category),
+      tags: String(rawData.tags),
     },
     errors: {fieldErrors: errors.fieldErrors},
   }}
@@ -48,6 +52,8 @@ export async function handleNewQuote (_previousState: NewQuoteFormState,
     likesCount: 0,
     createdAt: now,
     updatedAt: now,
+    category: result.data.category,
+    tags: result.data.tags ? result.data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
   }
 
   return {
