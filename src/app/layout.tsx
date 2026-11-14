@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, DM_Sans, Nunito_Sans } from "next/font/google";
 import "./globals.css";
-import { QuoteProvider } from "@/app/context/QuoteContext";
 import { cn } from "@/lib/utils";
 import { TopNavigation } from "@/components/TopNavigation";
 
@@ -47,7 +46,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <TopNavigation />
-        <QuoteProvider>{children}</QuoteProvider>
+        {children}
       </body>
     </html>
   );

@@ -2,11 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect } from "react";
 import { handleNewQuote } from "./action";
 import { useRouter } from "next/navigation";
 import { NewQuoteFormState, quoteSchema, quoteCategories } from "@/type";
-import { useQuotes } from "@/app/context/QuoteContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -22,8 +21,6 @@ const initialState = {
 
 export default function NewQuotePage() {
   const router = useRouter();
-  const { addQuote } = useQuotes();
-  const hasAdded = useRef(false);
   const [state, dispatchAction, isPending] = useActionState<
     NewQuoteFormState,
     FormData
@@ -35,12 +32,10 @@ export default function NewQuotePage() {
   } = useForm({ mode: "onChange", resolver: zodResolver(quoteSchema) });
 
   useEffect(() => {
-    if (state.success && state.createdQuote && !hasAdded.current) {
-      hasAdded.current = true;
-      addQuote(state.createdQuote);
+    if (state.success && state.createdQuote) {
       router.push("/quotes/new/success");
     }
-  }, [state.success, state.createdQuote, addQuote, router]);
+  }, [state.success, state.createdQuote, router]);
 
   return (
     <form
