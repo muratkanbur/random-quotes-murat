@@ -18,6 +18,7 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
   const [isLiking, setIsLiking] = useState(false);
   const [showLoginNotice, setShowLoginNotice] = useState(false);
   const [likeError, setLikeError] = useState<string | null>(null);
+  const [copyMessage, setCopyMessage] = useState("");
   const { user } = useUser();
   const loginDialogRef = useRef<HTMLDialogElement>(null);
   const closeDialogButtonRef = useRef<HTMLButtonElement>(null);
@@ -77,14 +78,30 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
   const isLiked = currentQuote.isLiked;
   const isOwner = currentQuote.isOwner;
   function handleClick() {
+    setCopyMessage("");
     setIndex((prevIndex) => (prevIndex + 1) % filteredQuotes.length);
   }
 
   function handlePrevClick() {
+    setCopyMessage("");
     setIndex(
       (prevIndex) =>
         (prevIndex - 1 + filteredQuotes.length) % filteredQuotes.length,
     );
+  }
+
+  async function handleCopyQuote() {
+    setCopyMessage("");
+
+    try {
+      await navigator.clipboard.writeText(
+        `“${currentQuote.quote}” — ${currentQuote.author}`,
+      );
+      setCopyMessage("Quote copied.");
+    } catch (error) {
+      console.error("Could not copy quote", error);
+      setCopyMessage("Could not copy the quote. Please try again.");
+    }
   }
 
   async function handleLike() {
@@ -197,7 +214,30 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
           className="flex-1 flex flex-col justify-center pt-8 pb-2 px-2"
         >
           <div className={isLiked ? "italic transition-all duration-300" : ""}>
-            <QuoteText>{currentQuote?.quote}</QuoteText>
+            <QuoteText>
+              {currentQuote?.quote}
+              <button
+                type="button"
+                onClick={handleCopyQuote}
+                aria-label="Copy quote"
+                title="Copy quote"
+                className="ml-2 inline-flex size-7 translate-y-1 items-center justify-center rounded-full text-muted-foreground not-italic transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-4"
+                >
+                  <rect x="8" y="8" width="14" height="14" rx="2" />
+                  <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+                </svg>
+              </button>
+            </QuoteText>
           </div>
           <Subtitle>{currentQuote?.author}</Subtitle>
 
@@ -220,7 +260,15 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
             </div>
           )}
         </div>
-
+        {copyMessage && (
+          <p
+            role="status"
+            aria-live="polite"
+            className="mb-3 text-sm text-center"
+          >
+            {copyMessage}
+          </p>
+        )}
         <div className="flex gap-4 justify-center">
           <Button
             title="Previous quote"

@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Random Quotes
+
+A quote-sharing app built with Next.js. Browse quotes in a shuffled order, filter them by category, like your favorites, and contribute your own quotes.
+
+## Features
+
+- Browse quotes in a shuffled order
+- Filter quotes by category
+- Like and unlike quotes
+- View your liked quotes and their like counts
+- Add, edit, and delete your own quotes
+- Add up to five tags to a quote, with a 20-character limit per tag
+- Sign in with Auth0
+- Switch between light and dark themes
+
+## Requirements
+
+- Node.js 20 or later
+- npm
+- A MongoDB database
+- An Auth0 Regular Web Application
 
 ## Getting Started
 
-First, run the development server:
+1. Install the dependencies:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env.local` file in the project root and add the environment variables below.
+
+3. In your Auth0 application settings, configure these local URLs:
+
+   - **Allowed Callback URL:** `http://localhost:3000/auth/callback`
+   - **Allowed Logout URL:** `http://localhost:3000`
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+Add these variable names to `.env.local` and provide your own values:
+
+```env
+AUTH0_DOMAIN=
+AUTH0_CLIENT_ID=
+AUTH0_CLIENT_SECRET=
+AUTH0_SECRET=
+APP_BASE_URL=http://localhost:3000
+
+MONGODB_URI=
+MONGODB_DB=quotes-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Get the Auth0 domain and client credentials from your Auth0 application settings. Generate an `AUTH0_SECRET` with:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+openssl rand -hex 32
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`APP_BASE_URL` is optional for local development; it is included here to make the app URL explicit. `MONGODB_DB` is also optional and defaults to `quotes-app`.
 
-## Learn More
+Keep `.env.local` private. Never commit credentials, secrets, or database connection strings.
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev    # Start the development server
+npm run lint   # Run ESLint
+npm run build  # Create a production build
+npm run start  # Start the production server
+```
