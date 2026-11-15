@@ -57,6 +57,7 @@ export default function LikedQuotesClient({
               <LikeButton
                 isLiked={true}
                 handleClick={() => handleUnlike(quote.id)}
+                likeCount={quote.likedBy?.length ?? 0}
               />
             </div>
 

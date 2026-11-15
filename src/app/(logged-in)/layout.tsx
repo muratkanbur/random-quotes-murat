@@ -2,7 +2,7 @@ import { QuoteText } from "@/components/typography/QuoteText";
 import { Button } from "@/components/ui/button";
 import { auth0 } from "@/lib/auth0";
 
-export default async function loggedInLayout({
+export default async function LoggedInLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,9 +15,7 @@ export default async function loggedInLayout({
     return (
       <div className="my-10 text-center">
         <QuoteText>Please log in below to see this page</QuoteText>
-        <Button>
-          <a href="/auth/login">Log in</a>
-        </Button>
+        <Button render={<a href="/auth/login" />}>Log in</Button>{" "}
       </div>
     );
   }

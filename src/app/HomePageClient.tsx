@@ -16,6 +16,7 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
   const [index, setIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isLiking, setIsLiking] = useState(false);
+  const [showLoginNotice, setShowLoginNotice] = useState(false);
   const { user } = useUser();
   const filteredQuotes =
     selectedCategory === "All"
@@ -24,7 +25,7 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
 
   if (!quotes || quotes.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-slate-100/80 dark:bg-background text-foreground p-4">
+      <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
         <p className="text-muted-foreground font-medium">
           No quotes yet. Add a quote to get started.
         </p>
@@ -80,7 +81,6 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
 
   async function handleLike() {
     if (!user?.sub) {
-      alert("You need to be logged in to like a quote.");
       return;
     }
 
@@ -144,7 +144,25 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
         )}
 
         <div className="absolute top-4 right-4">
-          <LikeButton isLiked={isLiked} handleClick={handleLike} />
+          {user?.sub ? (
+            <LikeButton
+              isLiked={isLiked}
+              handleClick={handleLike}
+              likeCount={currentQuote.likedBy?.length ?? 0}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowLoginNotice(true)}
+              aria-label="Like quote"
+              className="flex items-center justify-center gap-2 bg-green-800 text-white hover:bg-green-900 px-3 py-1 rounded-full transition-all"
+            >
+              <>
+                <span aria-hidden="true">🤍</span>
+                <span>{currentQuote.likedBy?.length ?? 0}</span>
+              </>{" "}
+            </button>
+          )}
         </div>
         <div
           aria-live="polite"
@@ -180,16 +198,54 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
             title="Previous quote"
             aria-label="Previous quote"
             handleClick={handlePrevClick}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-colors"
+            className="bg-green-800 text-white hover:bg-green-900 shadow-md transition-colors"
           />
           <Button
             title="Next quote"
             aria-label="Next quote"
             handleClick={handleClick}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-colors"
+            className="bg-green-800 text-white hover:bg-green-900 shadow-md transition-colors"
           />
         </div>
       </Card>
+      {!user?.sub && showLoginNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="login-notice-title"
+            className="relative w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-xl"
+          >
+            <button
+              type="button"
+              onClick={() => setShowLoginNotice(false)}
+              aria-label="Close dialog"
+              className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              ×
+            </button>
+
+            <div aria-hidden="true" className="mb-3 text-3xl">
+              🤍
+            </div>
+
+            <h2 id="login-notice-title" className="mb-2 text-lg font-semibold">
+              Log in to like
+            </h2>
+
+            <p className="mb-5 text-sm text-muted-foreground">
+              Log in to save this quote to your liked quotes.
+            </p>
+
+            <a
+              href="/auth/login"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-green-800 px-5 py-2.5 font-medium text-white shadow-md transition-colors hover:bg-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              Log in
+            </a>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
