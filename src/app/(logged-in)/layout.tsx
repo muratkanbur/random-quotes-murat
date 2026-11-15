@@ -1,0 +1,22 @@
+import { QuoteText } from "@/components/typography/QuoteText";
+import { Button } from "@/components/ui/button";
+import { auth0 } from "@/lib/auth0";
+
+export default async function LoggedInLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth0.getSession();
+
+  if (session) {
+    return <div>{children}</div>;
+  } else {
+    return (
+      <div className="my-10 text-center">
+        <QuoteText>Please log in below to see this page</QuoteText>
+        <Button render={<a href="/auth/login" />}>Log in</Button>{" "}
+      </div>
+    );
+  }
+}
