@@ -65,6 +65,24 @@ export const quoteSchema = z.object({
   tags: z
     .string()
     .trim()
-    .max(20, { message: "Tag should be at most 20 characters long." })
-    .optional(),
+    .optional()
+    .refine(
+      (value) =>
+        !value ||
+        value
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean).length <= 5,
+      { message: "You can add up to 5 tags." },
+    )
+    .refine(
+      (value) =>
+        !value ||
+        value
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+          .every((tag) => tag.length <= 20),
+      { message: "Each tag must be 20 characters or fewer." },
+    ),
 });
