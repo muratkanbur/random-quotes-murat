@@ -5,6 +5,8 @@ import {
   NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
@@ -15,13 +17,13 @@ export async function TopNavigation() {
 
   return (
     <header className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between px-4 mx-auto">
-        <NavigationMenu className="max-w-none">
-          <NavigationMenuList>
+      <div className="container mx-auto flex h-14 items-center justify-between px-3 sm:px-4">
+        <NavigationMenu className="max-w-none flex-none justify-start">
+          <NavigationMenuList className="flex-none justify-start">
             <NavigationMenuItem>
               <NavigationMenuLink
                 render={<Link href="/" />}
-                className={navigationMenuTriggerStyle()}
+                className={`${navigationMenuTriggerStyle()} !px-2 !text-base sm:!px-4`}
               >
                 Home
               </NavigationMenuLink>
@@ -30,25 +32,34 @@ export async function TopNavigation() {
             {!!session ? (
               <>
                 <NavigationMenuItem>
-                  <NavigationMenuLink
-                    render={<Link href="/user/quotes/liked" />}
-                    className={navigationMenuTriggerStyle()}
-                  >
-                    Liked Quotes
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    render={<Link href="/quotes/new" />}
-                    className={navigationMenuTriggerStyle()}
-                  >
-                    Add New Quotes
-                  </NavigationMenuLink>
+                  <NavigationMenuTrigger className="!px-2 !text-base sm:!px-4">
+                    Quotes
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="min-w-48">
+                    <ul className="flex list-none flex-col gap-1 p-0">
+                      <li>
+                        <NavigationMenuLink
+                          render={<Link href="/user/quotes/liked" />}
+                          className="w-full justify-start"
+                        >
+                          Liked Quotes
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink
+                          render={<Link href="/quotes/new" />}
+                          className="w-full justify-start"
+                        >
+                          Add New Quotes
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     render={<Link href="/user/profile" />}
-                    className={navigationMenuTriggerStyle()}
+                    className={`${navigationMenuTriggerStyle()} !px-2 !text-base sm:!px-4`}
                   >
                     Profile
                   </NavigationMenuLink>
@@ -56,7 +67,7 @@ export async function TopNavigation() {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     render={<a href="/auth/logout" />}
-                    className={navigationMenuTriggerStyle()}
+                    className={`${navigationMenuTriggerStyle()} !px-2 !text-base sm:!px-4`}
                   >
                     Log out
                   </NavigationMenuLink>
@@ -67,7 +78,7 @@ export async function TopNavigation() {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     render={<a href="/auth/login" />}
-                    className={navigationMenuTriggerStyle()}
+                    className={`${navigationMenuTriggerStyle()} !px-2 !text-base sm:!px-4`}
                   >
                     Log in
                   </NavigationMenuLink>
@@ -75,7 +86,7 @@ export async function TopNavigation() {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     render={<a href="/auth/login?screen_hint=signup" />}
-                    className={navigationMenuTriggerStyle()}
+                    className={`${navigationMenuTriggerStyle()} !px-2 !text-base sm:!px-4`}
                   >
                     Sign up
                   </NavigationMenuLink>

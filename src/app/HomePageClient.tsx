@@ -155,7 +155,11 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
           ))}
         </select>
       </label>
-      <Card isLiked={isLiked} key={currentQuote?.id || index}>
+      <Card
+        isLiked={isLiked}
+        key={currentQuote?.id || index}
+        className="md:max-w-lg xl:max-w-xl"
+      >
         {isOwner && (
           <div className="absolute top-4 left-4">
             <Link

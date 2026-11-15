@@ -1,18 +1,22 @@
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface CardProps {
   children: ReactNode;
   isLiked?: boolean;
+  className?: string;
 }
 
-export const Card = ({ children, isLiked }: CardProps) => {
+export const Card = ({ children, isLiked, className }: CardProps) => {
   return (
     <div
-      className={`relative text-center bg-card text-card-foreground p-6 rounded-2xl border border-border shadow-md max-w-md w-full min-h-[230px] flex flex-col justify-between transition-all duration-300 ${
+      className={cn(
+        "relative flex min-h-[230px] w-full max-w-md flex-col justify-between rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-md transition-all duration-300",
         isLiked
           ? "border-destructive/80 shadow-destructive/10"
-          : "border-border shadow-sm"
-      }`}
+          : "border-border shadow-sm",
+        className,
+      )}
     >
       {children}
     </div>

@@ -41,54 +41,59 @@ export default function LikedQuotesClient({
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4 gap-4">
+    <main className="min-h-[calc(100vh-3.5rem)] bg-background p-4 text-foreground">
       {likeError && (
-        <p role="alert" className="text-sm text-destructive">
+        <p
+          role="alert"
+          className="mx-auto mb-4 max-w-6xl text-sm text-destructive"
+        >
           {likeError}
         </p>
       )}
       {quotes.length === 0 ? (
-        <p className="text-muted-foreground font-semibold">
+        <p className="pt-8 text-center font-semibold text-muted-foreground">
           There are no liked quotes yet.
         </p>
       ) : (
-        quotes.map((quote) => (
-          <Card isLiked={quote.isLiked} key={quote.id}>
-            <div className="absolute top-4 right-4">
-              <LikeButton
-                isLiked={true}
-                handleClick={() => handleUnlike(quote.id)}
-                likeCount={quote.likeCount}
-              />
-            </div>
-
-            <div className="flex-1 flex flex-col justify-center pt-6 pb-2 px-2">
-              <div className="italic transition-all duration-300">
-                <QuoteText>{quote.quote}</QuoteText>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {quotes.map((quote) => (
+            <Card isLiked={quote.isLiked} key={quote.id}>
+              <div className="absolute top-4 right-4">
+                <LikeButton
+                  isLiked={true}
+                  handleClick={() => handleUnlike(quote.id)}
+                  likeCount={quote.likeCount}
+                />
               </div>
-              <Subtitle>{quote.author}</Subtitle>
 
-              {quote.category && (
-                <span className="mt-3 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  {quote.category}
-                </span>
-              )}
-
-              {!!quote.tags?.length && (
-                <div className="mt-2 flex flex-wrap justify-center gap-2">
-                  {quote.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+              <div className="flex-1 flex flex-col justify-center pt-6 pb-2 px-2">
+                <div className="italic transition-all duration-300">
+                  <QuoteText>{quote.quote}</QuoteText>
                 </div>
-              )}
-            </div>
-          </Card>
-        ))
+                <Subtitle>{quote.author}</Subtitle>
+
+                {quote.category && (
+                  <span className="mt-3 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                    {quote.category}
+                  </span>
+                )}
+
+                {!!quote.tags?.length && (
+                  <div className="mt-2 flex flex-wrap justify-center gap-2">
+                    {quote.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
       )}
     </main>
   );
