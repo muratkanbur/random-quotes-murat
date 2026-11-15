@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   handleDeleteQuote,
@@ -19,6 +19,7 @@ interface EditQuoteFormProps {
 }
 export default function EditQuoteForm({ id, quote }: EditQuoteFormProps) {
   const router = useRouter();
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
 
   const initialState: EditQuoteFormState = {
     success: false,
@@ -135,33 +136,53 @@ export default function EditQuoteForm({ id, quote }: EditQuoteFormProps) {
           {isPending ? "Updating..." : "Update Quote"}
         </Button>
       </form>
-      <form
-        action={deleteAction}
-        onSubmit={(event) => {
-          if (
-            !window.confirm("Bu alıntıyı silmek istediğinizden emin misiniz?")
-          ) {
-            event.preventDefault();
-          }
-        }}
-      >
-        <input type="hidden" name="quoteId" value={id} />
-
+      <div>
         <Button
           className="w-full"
           variant="destructive"
-          type="submit"
-          disabled={isDeleting}
+          type="button"
+          onClick={() => deleteDialogRef.current?.showModal()}
         >
-          {isDeleting ? "Deleting..." : "Delete Quote"}
+          Delete Quote
         </Button>
 
-        {deleteState.message && !deleteState.success && (
-          <p role="alert" className="mt-2 text-sm text-destructive">
-            {deleteState.message}
+        <dialog
+          ref={deleteDialogRef}
+          aria-labelledby="delete-dialog-title"
+          className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-xl backdrop:bg-black/50"
+        >
+          <h2 id="delete-dialog-title" className="mb-2 text-lg font-semibold">
+            Delete this quote?
+          </h2>
+          <p className="mb-5 text-sm text-muted-foreground">
+            This action cannot be undone.
           </p>
-        )}
-      </form>
+
+          <form action={deleteAction}>
+            <input type="hidden" name="quoteId" value={id} />
+
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => deleteDialogRef.current?.close()}
+              >
+                Cancel
+              </Button>
+
+              <Button variant="destructive" type="submit" disabled={isDeleting}>
+                {isDeleting ? "Deleting..." : "Delete Quote"}
+              </Button>
+            </div>
+
+            {deleteState.message && !deleteState.success && (
+              <p role="alert" className="mt-3 text-sm text-destructive">
+                {deleteState.message}
+              </p>
+            )}
+          </form>
+        </dialog>
+      </div>{" "}
     </div>
   );
 }

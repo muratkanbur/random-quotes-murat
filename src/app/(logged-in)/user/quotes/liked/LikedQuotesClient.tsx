@@ -15,26 +15,26 @@ export default function LikedQuotesClient({
 }) {
   const [quotes, setQuotes] = useState(initialQuotes);
   const [updatingQuoteId, setUpdatingQuoteId] = useState<string | null>(null);
+  const [likeError, setLikeError] = useState<string | null>(null);
 
   async function handleUnlike(quoteId: string) {
     if (updatingQuoteId) return;
-
+    setLikeError(null);
     setUpdatingQuoteId(quoteId);
 
     try {
       const result = await toggleQuoteLike(quoteId);
 
       if (!result.success) {
-        alert(result.message);
+        setLikeError(result.message);
         return;
       }
-
       setQuotes((current) =>
         current.filter((quote) => quote.id !== quoteId || result.isLiked),
       );
     } catch (error) {
       console.error("Could not update liked quote", error);
-      alert("Could not update the like. Please try again.");
+      setLikeError("Could not update the like. Please try again.");
     } finally {
       setUpdatingQuoteId(null);
     }
@@ -42,6 +42,11 @@ export default function LikedQuotesClient({
 
   return (
     <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4 gap-4">
+      {likeError && (
+        <p role="alert" className="text-sm text-destructive">
+          {likeError}
+        </p>
+      )}
       {quotes.length === 0 ? (
         <p className="text-muted-foreground font-semibold">
           There are no liked quotes yet.

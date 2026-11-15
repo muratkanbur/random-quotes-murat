@@ -3,7 +3,7 @@
 import { QuoteText } from "@/components/typography/QuoteText";
 import { Subtitle } from "@/components/typography/Subtitle";
 import { Button } from "@/components/Button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LikeButton } from "@/components/LikeButton";
 import { Card } from "@/components/Card";
 import { useUser } from "@auth0/nextjs-auth0/client";
@@ -17,7 +17,10 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isLiking, setIsLiking] = useState(false);
   const [showLoginNotice, setShowLoginNotice] = useState(false);
+  const [likeError, setLikeError] = useState<string | null>(null);
   const { user } = useUser();
+  const loginDialogRef = useRef<HTMLDialogElement>(null);
+  const closeDialogButtonRef = useRef<HTMLButtonElement>(null);
   const filteredQuotes =
     selectedCategory === "All"
       ? displayQuotes
@@ -26,9 +29,19 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
   if (!quotes || quotes.length === 0) {
     return (
       <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
-        <p className="text-muted-foreground font-medium">
-          No quotes yet. Add a quote to get started.
-        </p>
+        <p className="text-muted-foreground font-medium">No quotes yet.</p>
+        {user?.sub ? (
+          <Link
+            href="/quotes/new"
+            className="mt-3 rounded-lg bg-green-800 px-5 py-2.5 font-medium text-white shadow-md transition-colors hover:bg-green-900"
+          >
+            Add the first quote
+          </Link>
+        ) : (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Log in to add the first quote.
+          </p>
+        )}{" "}
       </main>
     );
   }
@@ -82,15 +95,14 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
     if (!currentQuote?.id || isLiking) {
       return;
     }
+    setLikeError(null);
     setIsLiking(true);
-
     try {
       const result = await toggleQuoteLike(currentQuote.id);
       if (!result.success) {
-        alert(result.message);
+        setLikeError(result.message);
         return;
       }
-
       setDisplayQuotes((current) =>
         current.map((quote) =>
           quote.id === currentQuote.id
@@ -104,11 +116,25 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
       );
     } catch (error) {
       console.error("Could not save quote like", error);
-      alert("Could not save your like. Please try again.");
+      setLikeError("Could not save your like. Please try again.");
     } finally {
       setIsLiking(false);
     }
   }
+
+  useEffect(() => {
+    const dialog = loginDialogRef.current;
+
+    if (!dialog) return;
+
+    if (showLoginNotice && !dialog.open) {
+      dialog.showModal();
+      closeDialogButtonRef.current?.focus();
+    } else if (!showLoginNotice && dialog.open) {
+      dialog.close();
+    }
+  }, [showLoginNotice]);
+
   return (
     <main className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] bg-background text-foreground p-4">
       <label className="mb-4 flex items-center gap-2">
@@ -129,7 +155,6 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
           ))}
         </select>
       </label>
-
       <Card isLiked={isLiked} key={currentQuote?.id || index}>
         {isOwner && (
           <div className="absolute top-4 left-4">
@@ -207,44 +232,46 @@ export default function Home({ quotes }: { quotes: QuoteView[] }) {
           />
         </div>
       </Card>
-      {!user?.sub && showLoginNotice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="login-notice-title"
-            className="relative w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-xl"
-          >
-            <button
-              type="button"
-              onClick={() => setShowLoginNotice(false)}
-              aria-label="Close dialog"
-              className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              ×
-            </button>
-
-            <div aria-hidden="true" className="mb-3 text-3xl">
-              🤍
-            </div>
-
-            <h2 id="login-notice-title" className="mb-2 text-lg font-semibold">
-              Log in to like
-            </h2>
-
-            <p className="mb-5 text-sm text-muted-foreground">
-              Log in to save this quote to your liked quotes.
-            </p>
-
-            <a
-              href="/auth/login"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-green-800 px-5 py-2.5 font-medium text-white shadow-md transition-colors hover:bg-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              Log in
-            </a>
-          </div>
-        </div>
+      {likeError && (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {likeError}
+        </p>
       )}
+      <dialog
+        ref={loginDialogRef}
+        onClose={() => setShowLoginNotice(false)}
+        aria-labelledby="login-notice-title"
+        className="fixed inset-0 m-auto w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-xl backdrop:bg-black/50"
+      >
+        <button
+          ref={closeDialogButtonRef}
+          type="button"
+          onClick={() => setShowLoginNotice(false)}
+          aria-label="Close dialog"
+          className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full text-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          ×
+        </button>
+
+        <div aria-hidden="true" className="mb-3 text-3xl">
+          🤍
+        </div>
+
+        <h2 id="login-notice-title" className="mb-2 text-lg font-semibold">
+          Log in to like
+        </h2>
+
+        <p className="mb-5 text-sm text-muted-foreground">
+          Log in to save this quote to your liked quotes.
+        </p>
+
+        <a
+          href="/auth/login"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-green-800 px-5 py-2.5 font-medium text-white shadow-md transition-colors hover:bg-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Log in
+        </a>
+      </dialog>{" "}
     </main>
   );
 }
