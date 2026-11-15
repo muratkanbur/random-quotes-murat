@@ -11,19 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { quoteCategories, Quote } from "@/type";
+import { quoteCategories, QuoteView } from "@/type";
 
 interface EditQuoteFormProps {
   id: string;
-  currentUserId: string;
-  quote: Quote;
+  quote: Pick<QuoteView, "quote" | "author" | "category" | "tags">;
 }
-
-export default function EditQuoteForm({
-  id,
-  currentUserId,
-  quote,
-}: EditQuoteFormProps) {
+export default function EditQuoteForm({ id, quote }: EditQuoteFormProps) {
   const router = useRouter();
 
   const initialState: EditQuoteFormState = {
@@ -58,19 +52,6 @@ export default function EditQuoteForm({
         <h2 className="text-xl font-semibold text-red-600">No Quote Found</h2>
         <p className="mt-2 text-muted-foreground">
           The quote you wish to edit does not exist.
-        </p>
-      </div>
-    );
-  }
-
-  if (quote.createdBy !== currentUserId) {
-    return (
-      <div className="max-w-xl mx-auto p-6 text-center border border-red-200 bg-red-50 rounded-lg">
-        <h2 className="text-xl font-semibold text-red-600">
-          Unauthorized Access
-        </h2>
-        <p className="mt-2 text-neutral-700">
-          Only the user who created this quote can edit it.
         </p>
       </div>
     );

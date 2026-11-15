@@ -8,10 +8,10 @@ import { LikeButton } from "@/components/LikeButton";
 import { Card } from "@/components/Card";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
-import { Quote, quoteCategories } from "@/type";
+import { QuoteView, quoteCategories } from "@/type";
 import { toggleQuoteLike } from "./action";
 
-export default function Home({ quotes }: { quotes: Quote[] }) {
+export default function Home({ quotes }: { quotes: QuoteView[] }) {
   const [displayQuotes, setDisplayQuotes] = useState(quotes);
   const [index, setIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -61,13 +61,8 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
   }
 
   const currentQuote = filteredQuotes[index % filteredQuotes.length];
-  const isLiked = Boolean(
-    user?.sub && currentQuote?.likedBy?.includes(user.sub),
-  );
-
-  const isOwner = Boolean(
-    user?.sub && currentQuote?.createdBy && currentQuote.createdBy === user.sub,
-  );
+  const isLiked = currentQuote.isLiked;
+  const isOwner = currentQuote.isOwner;
   function handleClick() {
     setIndex((prevIndex) => (prevIndex + 1) % filteredQuotes.length);
   }
@@ -99,7 +94,11 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
       setDisplayQuotes((current) =>
         current.map((quote) =>
           quote.id === currentQuote.id
-            ? { ...quote, likedBy: result.likedBy }
+            ? {
+                ...quote,
+                likeCount: result.likeCount,
+                isLiked: result.isLiked,
+              }
             : quote,
         ),
       );
@@ -148,7 +147,7 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
             <LikeButton
               isLiked={isLiked}
               handleClick={handleLike}
-              likeCount={currentQuote.likedBy?.length ?? 0}
+              likeCount={currentQuote.likeCount}
             />
           ) : (
             <button
@@ -159,7 +158,7 @@ export default function Home({ quotes }: { quotes: Quote[] }) {
             >
               <>
                 <span aria-hidden="true">🤍</span>
-                <span>{currentQuote.likedBy?.length ?? 0}</span>
+                <span>{currentQuote.likeCount}</span>
               </>{" "}
             </button>
           )}

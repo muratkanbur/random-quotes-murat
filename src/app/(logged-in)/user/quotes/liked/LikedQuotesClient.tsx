@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Quote } from "@/type";
+import type { QuoteView } from "@/type";
 import { Card } from "@/components/Card";
 import { LikeButton } from "@/components/LikeButton";
 import { QuoteText } from "@/components/typography/QuoteText";
@@ -10,10 +10,8 @@ import { toggleQuoteLike } from "@/app/action";
 
 export default function LikedQuotesClient({
   initialQuotes,
-  userId,
 }: {
-  initialQuotes: Quote[];
-  userId: string;
+  initialQuotes: QuoteView[];
 }) {
   const [quotes, setQuotes] = useState(initialQuotes);
   const [updatingQuoteId, setUpdatingQuoteId] = useState<string | null>(null);
@@ -32,9 +30,7 @@ export default function LikedQuotesClient({
       }
 
       setQuotes((current) =>
-        current.filter(
-          (quote) => quote.id !== quoteId || result.likedBy.includes(userId),
-        ),
+        current.filter((quote) => quote.id !== quoteId || result.isLiked),
       );
     } catch (error) {
       console.error("Could not update liked quote", error);
@@ -52,12 +48,12 @@ export default function LikedQuotesClient({
         </p>
       ) : (
         quotes.map((quote) => (
-          <Card isLiked={true} key={quote.id}>
+          <Card isLiked={quote.isLiked} key={quote.id}>
             <div className="absolute top-4 right-4">
               <LikeButton
                 isLiked={true}
                 handleClick={() => handleUnlike(quote.id)}
-                likeCount={quote.likedBy?.length ?? 0}
+                likeCount={quote.likeCount}
               />
             </div>
 

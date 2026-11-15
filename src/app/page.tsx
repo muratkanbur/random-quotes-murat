@@ -1,4 +1,7 @@
-import { getQuotes } from "./action";
+import { auth0 } from "@/lib/auth0";
+import { listAllQuotes } from "@/repositories/quotes";
+import type { QuoteView } from "@/type";
+
 import HomePageClient from "./HomePageClient";
 
 function shuffleQuotes<T>(items: T[]): T[] {
@@ -13,7 +16,20 @@ function shuffleQuotes<T>(items: T[]): T[] {
 }
 
 export default async function Home() {
-  const quotes = await getQuotes();
+  const session = await auth0.getSession();
+  const userId = session?.user?.sub;
+  const quotes = await listAllQuotes();
 
-  return <HomePageClient quotes={shuffleQuotes(quotes)} />;
+  const quoteViews: QuoteView[] = quotes.map((quote) => ({
+    id: quote.id,
+    quote: quote.quote,
+    author: quote.author,
+    category: quote.category,
+    tags: quote.tags ?? [],
+    likeCount: quote.likedBy.length,
+    isLiked: Boolean(userId && quote.likedBy.includes(userId)),
+    isOwner: Boolean(userId && quote.createdBy === userId),
+  }));
+
+  return <HomePageClient quotes={shuffleQuotes(quoteViews)} />;
 }

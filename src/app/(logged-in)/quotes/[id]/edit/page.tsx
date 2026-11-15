@@ -11,7 +11,7 @@ export default async function EditQuotePage({ params }: EditQuotePageProps) {
   const session = await auth0.getSession();
 
   if (!session) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   const { id } = await params;
@@ -24,11 +24,28 @@ export default async function EditQuotePage({ params }: EditQuotePageProps) {
     );
   }
 
+  if (quote.createdBy !== session.user.sub) {
+    return (
+      <div className="max-w-xl mx-auto p-6 text-center border border-red-200 bg-red-50 rounded-lg">
+        <h2 className="text-xl font-semibold text-red-600">
+          Unauthorized Access
+        </h2>
+        <p className="mt-2 text-neutral-700">
+          Only the user who created this quote can edit it.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <EditQuoteForm
       id={quote.id}
-      currentUserId={session.user.sub}
-      quote={quote}
+      quote={{
+        quote: quote.quote,
+        author: quote.author,
+        category: quote.category,
+        tags: quote.tags ?? [],
+      }}
     />
   );
 }

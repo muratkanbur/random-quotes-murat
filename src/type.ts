@@ -18,6 +18,17 @@ export interface Quote extends InitialQuote {
   tags?: string[];
 }
 
+export interface QuoteView {
+  id: QuoteId;
+  quote: string;
+  author: string;
+  category?: string;
+  tags: string[];
+  likeCount: number;
+  isLiked: boolean;
+  isOwner: boolean;
+}
+
 export interface NewQuoteFormState {
   success: boolean;
   data?: {
